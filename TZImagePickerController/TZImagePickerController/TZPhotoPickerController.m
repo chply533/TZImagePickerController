@@ -410,7 +410,7 @@ static CGFloat itemMargin = 5;
         for (NSInteger i = 0; i < tzImagePickerVc.selectedModels.count; i++) {
             TZAssetModel *model = tzImagePickerVc.selectedModels[i];
             if (model.type == TZAssetModelMediaTypeVideo) {
-                [assets addObject:model.urlAsset ? model.urlAsset : @1];
+                [urlAssets addObject:model.urlAsset ? model.urlAsset : @1];
             }
             [assets addObject:model.asset];
             
@@ -437,7 +437,7 @@ static CGFloat itemMargin = 5;
                 if (info)  [infoArr replaceObjectAtIndex:i withObject:info];
                 if (model.type == TZAssetModelMediaTypeVideo) {
                     if (model.urlAsset) {
-                        [assets replaceObjectAtIndex:i withObject:model.urlAsset];
+                        [urlAssets replaceObjectAtIndex:i withObject:model.urlAsset];
                     }
                 }
                 [assets replaceObjectAtIndex:i withObject:model.asset];
