@@ -525,6 +525,36 @@ static dispatch_once_t onceToken;
 }
 
 #pragma mark - Get Video
+/// Get Video / 获取视频
+- (void)getVideoWithAssetModel:(TZAssetModel *)model completion:(void (^)(AVPlayerItem *, NSDictionary *))completion {
+    [self getVideoWithAssetModel:model progressHandler:nil completion:completion];
+}
+
+- (void)getVideoWithAssetModel:(TZAssetModel *)model progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler completion:(void (^)(AVPlayerItem *, NSDictionary *))completion {
+    PHVideoRequestOptions* options = [[PHVideoRequestOptions alloc] init];
+    options.version = PHVideoRequestOptionsVersionOriginal;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+    options.networkAccessAllowed = YES;
+    options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (progressHandler) {
+                progressHandler(progress, error, stop, info);
+            }
+        });
+    };
+    [[PHImageManager defaultManager] requestAVAssetForVideo:model.asset options:options resultHandler:^(AVAsset* avasset, AVAudioMix* audioMix, NSDictionary* info){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (avasset && [avasset isKindOfClass:[AVURLAsset class]]) {
+                AVURLAsset *videoAsset = (AVURLAsset*)avasset;
+                AVPlayerItem *playItem = [[AVPlayerItem alloc] initWithURL:videoAsset.URL];
+                model.urlAsset = videoAsset;
+                if (completion) completion(playItem,info);
+            }else{
+                if (completion) completion(nil,info);
+            }
+        });
+    }];
+}
 
 /// Get Video / 获取视频
 - (void)getVideoWithAsset:(PHAsset *)asset completion:(void (^)(AVPlayerItem *, NSDictionary *))completion {

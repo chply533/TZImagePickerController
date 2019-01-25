@@ -391,9 +391,16 @@
         [[TZImageManager manager] getPhotoWithAsset:self.model.asset completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
             self.cover = photo;
         }];
-        [[TZImageManager manager] getVideoWithAsset:self.model.asset completion:^(AVPlayerItem *playerItem, NSDictionary *info) {
+        [[TZImageManager manager] getVideoWithAssetModel:self.model completion:^(AVPlayerItem *playerItem, NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self configPlayerWithItem:playerItem];
+                if (playerItem) {
+                    [self configPlayerWithItem:playerItem];
+                }else{
+                    NSString *title = @"无法从iCloud下载该视频";
+                    UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"提示" message:title delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                    [alter show];
+                }
+                
             });
         }];
     } else {

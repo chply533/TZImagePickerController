@@ -305,14 +305,49 @@
             return;
             // 2. if not over the maxImagesCount / 如果没有超过最大个数限制
         } else {
-            [_tzImagePickerVc addSelectedModel:model];
-            if (self.photos) {
-                [_tzImagePickerVc.selectedAssets addObject:_assetsTemp[self.currentIndex]];
-                [self.photos addObject:_photosTemp[self.currentIndex]];
+            if (model.type == TZAssetModelMediaTypeVideo && !model.urlAsset) {
+                PHVideoRequestOptions* options = [[PHVideoRequestOptions alloc] init];
+                options.version = PHVideoRequestOptionsVersionOriginal;
+                options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+                options.networkAccessAllowed = YES;
+                
+                [[PHImageManager defaultManager] requestAVAssetForVideo:model.asset options:options resultHandler:^(AVAsset* avasset, AVAudioMix* audioMix, NSDictionary* info){
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (avasset && [avasset isKindOfClass:[AVURLAsset class]]) {
+                            AVURLAsset *videoAsset = (AVURLAsset*)avasset;
+                            model.isSelected = YES;
+                            model.urlAsset = videoAsset;
+                            [_tzImagePickerVc addSelectedModel:model];
+                            if (self.photos) {
+                                [_tzImagePickerVc.selectedAssets addObject:self->_assetsTemp[self.currentIndex]];
+                                [self.photos addObject:self->_photosTemp[self.currentIndex]];
+                            }
+                            if (model.type == TZAssetModelMediaTypeVideo && !_tzImagePickerVc.allowPickingMultipleVideo) {
+                                [_tzImagePickerVc showAlertWithTitle:[NSBundle tz_localizedStringForKey:@"Select the video when in multi state, we will handle the video as a photo"]];
+                            }
+                        }else{
+                            NSString *title = @"无法从iCloud下载该视频";
+                            [_tzImagePickerVc showAlertWithTitle:title];
+                        }
+                        [self refreshNaviBarAndBottomBarState];
+                        if (model.isSelected) {
+                            [UIView showOscillatoryAnimationWithLayer:selectButton.imageView.layer type:TZOscillatoryAnimationToBigger];
+                        }
+                        [UIView showOscillatoryAnimationWithLayer:self->_numberImageView.layer type:TZOscillatoryAnimationToSmaller];
+                    });
+                }];
+                return;
+            }else{
+                [_tzImagePickerVc addSelectedModel:model];
+                if (self.photos) {
+                    [_tzImagePickerVc.selectedAssets addObject:_assetsTemp[self.currentIndex]];
+                    [self.photos addObject:_photosTemp[self.currentIndex]];
+                }
+                if (model.type == TZAssetModelMediaTypeVideo && !_tzImagePickerVc.allowPickingMultipleVideo) {
+                    [_tzImagePickerVc showAlertWithTitle:[NSBundle tz_localizedStringForKey:@"Select the video when in multi state, we will handle the video as a photo"]];
+                }
             }
-            if (model.type == TZAssetModelMediaTypeVideo && !_tzImagePickerVc.allowPickingMultipleVideo) {
-                [_tzImagePickerVc showAlertWithTitle:[NSBundle tz_localizedStringForKey:@"Select the video when in multi state, we will handle the video as a photo"]];
-            }
+            
         }
     } else {
         NSArray *selectedModels = [NSArray arrayWithArray:_tzImagePickerVc.selectedModels];
@@ -345,6 +380,7 @@
             }
         }
     }
+
     model.isSelected = !selectButton.isSelected;
     [self refreshNaviBarAndBottomBarState];
     if (model.isSelected) {

@@ -18,7 +18,6 @@
 #import "TZLocationManager.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "TZImageRequestOperation.h"
-
 @interface TZPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;
     
@@ -44,6 +43,7 @@
 @property (nonatomic, strong) UIImagePickerController *imagePickerVc;
 @property (strong, nonatomic) CLLocation *location;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 @end
 
 static CGSize AssetGridThumbnailSize;
@@ -98,6 +98,21 @@ static CGFloat itemMargin = 5;
     
     self.operationQueue = [[NSOperationQueue alloc] init];
     self.operationQueue.maxConcurrentOperationCount = 3;
+    
+    
+}
+
+- (UIActivityIndicatorView *)indicatorView
+{
+    if (_indicatorView == nil) {
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        [self.view addSubview:indicator];
+        indicator.frame = self.view.bounds;
+        indicator.hidesWhenStopped = YES;
+        [indicator stopAnimating];
+        _indicatorView = indicator;
+    }
+    return _indicatorView;
 }
 
 - (void)fetchAssetModels {
@@ -389,15 +404,21 @@ static CGFloat itemMargin = 5;
     [tzImagePickerVc showProgressHUD];
     NSMutableArray *assets = [NSMutableArray array];
     NSMutableArray *photos;
+    NSMutableArray *urlAssets = [NSMutableArray array];
     NSMutableArray *infoArr;
     if (tzImagePickerVc.onlyReturnAsset) { // not fetch image
         for (NSInteger i = 0; i < tzImagePickerVc.selectedModels.count; i++) {
             TZAssetModel *model = tzImagePickerVc.selectedModels[i];
+            if (model.type == TZAssetModelMediaTypeVideo) {
+                [assets addObject:model.urlAsset ? model.urlAsset : @1];
+            }
             [assets addObject:model.asset];
+            
         }
     } else { // fetch image
         photos = [NSMutableArray array];
         infoArr = [NSMutableArray array];
+        
         for (NSInteger i = 0; i < tzImagePickerVc.selectedModels.count; i++) { [photos addObject:@1];[assets addObject:@1];[infoArr addObject:@1]; }
         
         __block BOOL havenotShowAlert = YES;
@@ -414,13 +435,17 @@ static CGFloat itemMargin = 5;
                     [photos replaceObjectAtIndex:i withObject:photo];
                 }
                 if (info)  [infoArr replaceObjectAtIndex:i withObject:info];
+                if (model.type == TZAssetModelMediaTypeVideo) {
+                    if (model.urlAsset) {
+                        [assets replaceObjectAtIndex:i withObject:model.urlAsset];
+                    }
+                }
                 [assets replaceObjectAtIndex:i withObject:model.asset];
-                
                 for (id item in photos) { if ([item isKindOfClass:[NSNumber class]]) return; }
                 
                 if (havenotShowAlert) {
                     [tzImagePickerVc hideAlertView:alertView];
-                    [self didGetAllPhotos:photos assets:assets infoArr:infoArr];
+                    [self didGetAllPhotos:photos assets:assets urlAssets:urlAssets infoArr:infoArr];
                 }
             } progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull info) {
                 // 如果图片正在从iCloud同步中,提醒用户
@@ -438,24 +463,24 @@ static CGFloat itemMargin = 5;
         }
     }
     if (tzImagePickerVc.selectedModels.count <= 0 || tzImagePickerVc.onlyReturnAsset) {
-        [self didGetAllPhotos:photos assets:assets infoArr:infoArr];
+        [self didGetAllPhotos:photos assets:assets urlAssets:urlAssets infoArr:infoArr];
     }
 }
 
-- (void)didGetAllPhotos:(NSArray *)photos assets:(NSArray *)assets infoArr:(NSArray *)infoArr {
+- (void)didGetAllPhotos:(NSArray *)photos assets:(NSArray *)assets urlAssets:(NSArray *)urlAssets infoArr:(NSArray *)infoArr {
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     [tzImagePickerVc hideProgressHUD];
     
     if (tzImagePickerVc.autoDismiss) {
         [self.navigationController dismissViewControllerAnimated:YES completion:^{
-            [self callDelegateMethodWithPhotos:photos assets:assets infoArr:infoArr];
+            [self callDelegateMethodWithPhotos:photos assets:assets urlAssets:urlAssets  infoArr:infoArr];
         }];
     } else {
-        [self callDelegateMethodWithPhotos:photos assets:assets infoArr:infoArr];
+        [self callDelegateMethodWithPhotos:photos assets:assets urlAssets:urlAssets infoArr:infoArr];
     }
 }
 
-- (void)callDelegateMethodWithPhotos:(NSArray *)photos assets:(NSArray *)assets infoArr:(NSArray *)infoArr {
+- (void)callDelegateMethodWithPhotos:(NSArray *)photos assets:(NSArray *)assets urlAssets:(NSArray *)urlAssets infoArr:(NSArray *)infoArr {
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     if (tzImagePickerVc.allowPickingVideo && tzImagePickerVc.maxImagesCount == 1) {
         if ([[TZImageManager manager] isVideo:[assets firstObject]]) {
@@ -474,6 +499,9 @@ static CGFloat itemMargin = 5;
     }
     if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(imagePickerController:didFinishPickingPhotos:sourceAssets:isSelectOriginalPhoto:infos:)]) {
         [tzImagePickerVc.pickerDelegate imagePickerController:tzImagePickerVc didFinishPickingPhotos:photos sourceAssets:assets isSelectOriginalPhoto:_isSelectOriginalPhoto infos:infoArr];
+    }
+    if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(imagePickerController:didFinishPickingPhotos:sourceAssets:isSelectOriginalPhoto:infos:urlAssets:)]) {
+        [tzImagePickerVc.pickerDelegate imagePickerController:tzImagePickerVc didFinishPickingPhotos:photos sourceAssets:assets isSelectOriginalPhoto:_isSelectOriginalPhoto infos:infoArr urlAssets:urlAssets];
     }
     if (tzImagePickerVc.didFinishPickingPhotosHandle) {
         tzImagePickerVc.didFinishPickingPhotosHandle(photos,assets,_isSelectOriginalPhoto);
@@ -568,14 +596,44 @@ static CGFloat itemMargin = 5;
                     [strongSelf doneButtonClick];
                     return;
                 }
-                strongCell.selectPhotoButton.selected = YES;
-                model.isSelected = YES;
-                [tzImagePickerVc addSelectedModel:model];
-                if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"TZ_PHOTO_PICKER_RELOAD_NOTIFICATION" object:strongSelf.navigationController];
+                if (model.type == TZAssetModelMediaTypeVideo && !model.urlAsset) {
+                    PHVideoRequestOptions* options = [[PHVideoRequestOptions alloc] init];
+                    options.version = PHVideoRequestOptionsVersionOriginal;
+                    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+                    options.networkAccessAllowed = YES;
+                    [strongSelf.indicatorView startAnimating];
+                    [[PHImageManager defaultManager] requestAVAssetForVideo:model.asset options:options resultHandler:^(AVAsset* avasset, AVAudioMix* audioMix, NSDictionary* info){
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [strongSelf.indicatorView stopAnimating];
+                            if (avasset && [avasset isKindOfClass:[AVURLAsset class]]) {
+                                AVURLAsset *videoAsset = (AVURLAsset*)avasset;
+                                strongCell.selectPhotoButton.selected = YES;
+                                model.isSelected = YES;
+                                model.urlAsset = videoAsset;
+                                [tzImagePickerVc addSelectedModel:model];
+                                if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
+                                    [[NSNotificationCenter defaultCenter] postNotificationName:@"TZ_PHOTO_PICKER_RELOAD_NOTIFICATION" object:strongSelf.navigationController];
+                                }
+                                [strongSelf refreshBottomToolBarStatus];
+                                [UIView showOscillatoryAnimationWithLayer:strongLayer type:TZOscillatoryAnimationToSmaller];
+                                [strongSelf.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+                            }else{
+                                NSString *title = @"无法从iCloud下载该视频";
+                                [tzImagePickerVc showAlertWithTitle:title];
+                            }
+                        });
+                    }];
+                }else{
+                    strongCell.selectPhotoButton.selected = YES;
+                    model.isSelected = YES;
+                    [tzImagePickerVc addSelectedModel:model];
+                    if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"TZ_PHOTO_PICKER_RELOAD_NOTIFICATION" object:strongSelf.navigationController];
+                    }
+                    [strongSelf refreshBottomToolBarStatus];
+                    [UIView showOscillatoryAnimationWithLayer:strongLayer type:TZOscillatoryAnimationToSmaller];
                 }
-                [strongSelf refreshBottomToolBarStatus];
-                [UIView showOscillatoryAnimationWithLayer:strongLayer type:TZOscillatoryAnimationToSmaller];
+                
             } else {
                 NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
                 [tzImagePickerVc showAlertWithTitle:title];
@@ -733,7 +791,7 @@ static CGFloat itemMargin = 5;
     }];
     [photoPreviewVc setDoneButtonClickBlockCropMode:^(UIImage *cropedImage, id asset) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf didGetAllPhotos:@[cropedImage] assets:@[asset] infoArr:nil];
+        [strongSelf didGetAllPhotos:@[cropedImage] assets:@[asset] urlAssets:nil infoArr:nil];
     }];
     [self.navigationController pushViewController:photoPreviewVc animated:YES];
 }

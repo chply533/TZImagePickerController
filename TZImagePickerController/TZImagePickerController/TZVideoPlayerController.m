@@ -64,16 +64,18 @@
             self->_doneButton.enabled = YES;
         }
     }];
-    [[TZImageManager manager] getVideoWithAsset:_model.asset completion:^(AVPlayerItem *playerItem, NSDictionary *info) {
+    [[TZImageManager manager] getVideoWithAssetModel:_model completion:^(AVPlayerItem *playerItem, NSDictionary *info) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_player = [AVPlayer playerWithPlayerItem:playerItem];
-            self->_playerLayer = [AVPlayerLayer playerLayerWithPlayer:self->_player];
-            self->_playerLayer.frame = self.view.bounds;
-            [self.view.layer addSublayer:self->_playerLayer];
-            [self addProgressObserver];
-            [self configPlayButton];
-            [self configBottomToolBar];
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self->_player.currentItem];
+            if (playerItem) {
+                self->_player = [AVPlayer playerWithPlayerItem:playerItem];
+                self->_playerLayer = [AVPlayerLayer playerLayerWithPlayer:self->_player];
+                self->_playerLayer.frame = self.view.bounds;
+                [self.view.layer addSublayer:self->_playerLayer];
+                [self addProgressObserver];
+                [self configPlayButton];
+                [self configBottomToolBar];
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self->_player.currentItem];
+            }
         });
     }];
 }

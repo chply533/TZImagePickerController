@@ -18,9 +18,11 @@ typedef enum : NSUInteger {
 } TZAssetModelMediaType;
 
 @class PHAsset;
+@class AVURLAsset;
 @interface TZAssetModel : NSObject
 
 @property (nonatomic, strong) PHAsset *asset;
+@property (nonatomic, strong) AVURLAsset *urlAsset;
 @property (nonatomic, assign) BOOL isSelected;      ///< The select status of a photo, default is No
 @property (nonatomic, assign) TZAssetModelMediaType type;
 @property (nonatomic, copy) NSString *timeLength;
