@@ -419,7 +419,7 @@ static CGFloat itemMargin = 5;
         photos = [NSMutableArray array];
         infoArr = [NSMutableArray array];
         
-        for (NSInteger i = 0; i < tzImagePickerVc.selectedModels.count; i++) { [photos addObject:@1];[assets addObject:@1];[infoArr addObject:@1]; }
+        for (NSInteger i = 0; i < tzImagePickerVc.selectedModels.count; i++) { [photos addObject:@1];[assets addObject:@1];[infoArr addObject:@1];[urlAssets addObject:@1]; }
         
         __block BOOL havenotShowAlert = YES;
         [TZImageManager manager].shouldFixOrientation = YES;
