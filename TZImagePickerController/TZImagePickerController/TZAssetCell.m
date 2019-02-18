@@ -135,6 +135,16 @@
 }
 
 - (void)selectPhotoButtonClick:(UIButton *)sender {
+    if (self.type == TZAssetModelMediaTypeVideo) {
+        PHAsset *phAsset = (PHAsset *)_model.asset;
+        NSString *timeLength = [NSString stringWithFormat:@"%0.0f",phAsset.duration];
+        if (timeLength.integerValue > 60) {
+            NSString *title = @"所选视频不能超过60s";
+            UIAlertView *alter = [[UIAlertView alloc] initWithTitle:nil message:title delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alter show];
+            return;
+        }
+    }
     if (self.didSelectPhotoBlock) {
         self.didSelectPhotoBlock(sender.isSelected);
     }

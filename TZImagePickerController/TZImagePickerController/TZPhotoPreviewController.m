@@ -305,6 +305,15 @@
             return;
             // 2. if not over the maxImagesCount / 如果没有超过最大个数限制
         } else {
+            if (model.type == TZAssetModelMediaTypeVideo) {
+                PHAsset *phAsset = (PHAsset *)model.asset;
+                NSString *timeLength = [NSString stringWithFormat:@"%0.0f",phAsset.duration];
+                if (timeLength.integerValue > 60) {
+                    NSString *title = @"所选视频不能超过60s";
+                    [_tzImagePickerVc showAlertWithTitle:title];
+                    return;
+                }
+            }
             if (model.type == TZAssetModelMediaTypeVideo && !model.urlAsset) {
                 PHVideoRequestOptions* options = [[PHVideoRequestOptions alloc] init];
                 options.version = PHVideoRequestOptionsVersionOriginal;
