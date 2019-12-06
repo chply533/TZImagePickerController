@@ -635,8 +635,13 @@ static CGFloat itemMargin = 5;
                 }
                 
             } else {
-                NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
-                [tzImagePickerVc showAlertWithTitle:title];
+                if (tzImagePickerVc.allowPickingVideo) {
+                    NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos or videos"], tzImagePickerVc.maxImagesCount];
+                    [tzImagePickerVc showAlertWithTitle:title];
+                }else{
+                    NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
+                    [tzImagePickerVc showAlertWithTitle:title];
+                }
             }
         }
     };
