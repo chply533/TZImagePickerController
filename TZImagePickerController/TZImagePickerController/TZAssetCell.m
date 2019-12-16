@@ -99,7 +99,7 @@
 
 - (void)setType:(TZAssetCellType)type {
     _type = type;
-    if (type == TZAssetCellTypePhoto || type == TZAssetCellTypeLivePhoto || (type == TZAssetCellTypePhotoGif && !self.allowPickingGif) || self.allowPickingMultipleVideo) {
+    if (type == TZAssetCellTypePhoto || type == TZAssetCellTypeLivePhoto || (type == TZAssetCellTypePhotoGif && self.allowPickingGif) || self.allowPickingMultipleVideo) {
         _selectImageView.hidden = NO;
         _selectPhotoButton.hidden = NO;
         _bottomView.hidden = YES;
