@@ -313,8 +313,8 @@
             if (model.type == TZAssetModelMediaTypeVideo) {
                 PHAsset *phAsset = (PHAsset *)model.asset;
                 NSString *timeLength = [NSString stringWithFormat:@"%0.0f",phAsset.duration];
-                if (timeLength.integerValue > 60) {
-                    NSString *title = @"所选视频不能超过60s";
+                if (timeLength.integerValue > 60 * 5) {
+                    NSString *title = @"所选视频不能超过5分钟";
                     [_tzImagePickerVc showAlertWithTitle:title];
                     return;
                 }
