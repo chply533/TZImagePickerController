@@ -380,8 +380,17 @@
 
 - (void)setModel:(TZAlbumModel *)model {
     _model = model;
-    
-    NSMutableAttributedString *nameString = [[NSMutableAttributedString alloc] initWithString:model.name attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:[UIColor blackColor]}];
+    UIColor *color = [UIColor blackColor];
+    if (@available(iOS 13.0, *)) {
+        color = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return [UIColor whiteColor];
+            }else{
+                return [UIColor blackColor];
+            }
+        }];
+    }
+    NSMutableAttributedString *nameString = [[NSMutableAttributedString alloc] initWithString:model.name attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:color}];
     NSAttributedString *countString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"  (%zd)",model.count] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:[UIColor lightGrayColor]}];
     [nameString appendAttributedString:countString];
     self.titleLabel.attributedText = nameString;
@@ -455,6 +464,23 @@
     return _selectedCountButton;
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+    UIColor *color = [UIColor blackColor];
+    if (@available(iOS 13.0, *)) {
+        color = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return [UIColor whiteColor];
+            }else{
+                return [UIColor blackColor];
+            }
+        }];
+    }
+    NSMutableAttributedString *nameString = [[NSMutableAttributedString alloc] initWithString:self.model.name attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:color}];
+    NSAttributedString *countString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"  (%zd)",self.model.count] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:[UIColor lightGrayColor]}];
+    [nameString appendAttributedString:countString];
+    self.titleLabel.attributedText = nameString;
+}
 @end
 
 
