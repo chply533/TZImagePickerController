@@ -433,7 +433,7 @@
     if (_titleLabel == nil) {
         UILabel *titleLabel = [[UILabel alloc] init];
         titleLabel.font = [UIFont boldSystemFontOfSize:17];
-        titleLabel.textColor = [UIColor blackColor];
+//        titleLabel.textColor = [UIColor blackColor];
         titleLabel.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:titleLabel];
         _titleLabel = titleLabel;
