@@ -32,6 +32,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, strong) UIImage *photoSelImage;
 @property (nonatomic, strong) UIImage *photoDefImage;
+@property (weak, nonatomic) UIImageView *selectImageView;
 
 @property (nonatomic, assign) BOOL showSelectBtn;
 @property (assign, nonatomic) BOOL allowPreview;

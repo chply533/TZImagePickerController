@@ -15,7 +15,6 @@
 
 @interface TZAssetCell ()
 @property (weak, nonatomic) UIImageView *imageView;       // The photo / 照片
-@property (weak, nonatomic) UIImageView *selectImageView;
 @property (weak, nonatomic) UILabel *indexLabel;
 @property (weak, nonatomic) UIView *bottomView;
 @property (weak, nonatomic) UILabel *timeLength;
@@ -329,11 +328,11 @@
         _selectPhotoButton.frame = self.bounds;
     }
     _selectImageView.frame = CGRectMake(self.tz_width - 27, 3, 24, 24);
-    if (_selectImageView.image.size.width <= 27) {
-        _selectImageView.contentMode = UIViewContentModeCenter;
-    } else {
+//    if (_selectImageView.image.size.width <= 27) {
+//        _selectImageView.contentMode = UIViewContentModeCenter;
+//    } else {
         _selectImageView.contentMode = UIViewContentModeScaleAspectFit;
-    }
+//    }
     _indexLabel.frame = _selectImageView.frame;
     _imageView.frame = CGRectMake(0, 0, self.tz_width, self.tz_height);
     
