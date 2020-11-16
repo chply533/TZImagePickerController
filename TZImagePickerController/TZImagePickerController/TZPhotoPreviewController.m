@@ -146,7 +146,7 @@
         _editButton.titleLabel.font = [UIFont systemFontOfSize:13];
         [_editButton setTitle:_tzImagePickerVc.editBtnTitleStr forState:UIControlStateNormal];
         [_editButton setTitle:_tzImagePickerVc.editBtnTitleStr forState:UIControlStateSelected];
-        [_editButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [_editButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_editButton setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
     }
     if (_tzImagePickerVc.allowPickingOriginalPhoto) {
@@ -301,7 +301,7 @@
         if (_tzImagePickerVc.allowEdit){
             originalPhotoButtonX = (self.view.tz_width - (fullImageWidth + 56)) * 0.5;
         }
-        _originalPhotoButton.frame = CGRectMake(0, originalPhotoButtonX, fullImageWidth + 56, 44);
+        _originalPhotoButton.frame = CGRectMake(originalPhotoButtonX, 0, fullImageWidth + 56, 44);
         _originalPhotoLabel.frame = CGRectMake(fullImageWidth + 42, 0, 80, 44);
     }
     [_doneButton sizeToFit];
@@ -508,7 +508,7 @@
         TZAssetModel *model = _models[self.currentIndex];
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.currentIndex inSection:0];
         TZPhotoPreviewCell *cell = (TZPhotoPreviewCell *)[_collectionView cellForItemAtIndexPath:indexPath];
-        _tzImagePickerVc.didEditPhotoHandle(self, cell.previewView.imageView.image, model.asset, self.isSelectOriginalPhoto);
+        _tzImagePickerVc.didEditPhotoHandle(self, model, cell.previewView.imageView.image, model.asset, self.isSelectOriginalPhoto);
     }
 }
 
