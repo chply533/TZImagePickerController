@@ -508,7 +508,7 @@
         TZAssetModel *model = _models[self.currentIndex];
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.currentIndex inSection:0];
         TZPhotoPreviewCell *cell = (TZPhotoPreviewCell *)[_collectionView cellForItemAtIndexPath:indexPath];
-        _tzImagePickerVc.didEditPhotoHandle(self, model, cell.previewView.imageView.image, model.asset, self.isSelectOriginalPhoto);
+        _tzImagePickerVc.didEditPhotoHandle(self, model, cell, model.asset, self.isSelectOriginalPhoto);
     }
 }
 
