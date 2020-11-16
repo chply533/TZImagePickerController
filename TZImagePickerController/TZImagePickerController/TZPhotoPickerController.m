@@ -510,6 +510,7 @@ static CGFloat itemMargin = 5;
                     }];
                 } else {
 //                    [self didGetAllPhotos:photos assets:assets infoArr:infoArr];
+                    [self didGetAllPhotos:photos assets:assets urlAssets:urlAssets infoArr:infoArr];
                 }
             } progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull info) {
                 // 如果图片正在从iCloud同步中,提醒用户
