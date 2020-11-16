@@ -33,6 +33,7 @@
     UILabel *_originalPhotoLabel;
     
     CGFloat _offsetItemCount;
+    UIButton *_editButton;
     
     BOOL _didSetIsSelectOriginalPhoto;
 }
@@ -137,6 +138,17 @@
     _toolBar.backgroundColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:0.7];
     
     TZImagePickerController *_tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+    if (_tzImagePickerVc.allowEdit) {
+        _editButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _editButton.imageEdgeInsets = UIEdgeInsetsMake(0, [TZCommonTools tz_isRightToLeftLayout] ? 10 : -10, 0, 0);
+        _editButton.backgroundColor = [UIColor clearColor];
+        [_editButton addTarget:self action:@selector(editButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _editButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_editButton setTitle:_tzImagePickerVc.editBtnTitleStr forState:UIControlStateNormal];
+        [_editButton setTitle:_tzImagePickerVc.editBtnTitleStr forState:UIControlStateSelected];
+        [_editButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [_editButton setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    }
     if (_tzImagePickerVc.allowPickingOriginalPhoto) {
         _originalPhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _originalPhotoButton.imageEdgeInsets = UIEdgeInsetsMake(0, [TZCommonTools tz_isRightToLeftLayout] ? 10 : -10, 0, 0);
@@ -181,6 +193,7 @@
     
     [_originalPhotoButton addSubview:_originalPhotoLabel];
     [_toolBar addSubview:_doneButton];
+    [_toolBar addSubview:_editButton];
     [_toolBar addSubview:_originalPhotoButton];
     [_toolBar addSubview:_numberImageView];
     [_toolBar addSubview:_numberLabel];
@@ -278,9 +291,17 @@
     CGFloat toolBarHeight = 44 + [TZCommonTools tz_safeAreaInsets].bottom;
     CGFloat toolBarTop = self.view.tz_height - toolBarHeight;
     _toolBar.frame = CGRectMake(0, toolBarTop, self.view.tz_width, toolBarHeight);
+    
+    if (_tzImagePickerVc.allowEdit){
+        _editButton.frame = CGRectMake(0, 0, 50, 44);
+    }
     if (_tzImagePickerVc.allowPickingOriginalPhoto) {
         CGFloat fullImageWidth = [_tzImagePickerVc.fullImageBtnTitleStr boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13]} context:nil].size.width;
-        _originalPhotoButton.frame = CGRectMake(0, 0, fullImageWidth + 56, 44);
+        CGFloat originalPhotoButtonX = 0;
+        if (_tzImagePickerVc.allowEdit){
+            originalPhotoButtonX = (self.view.tz_width - (fullImageWidth + 56)) * 0.5;
+        }
+        _originalPhotoButton.frame = CGRectMake(0, originalPhotoButtonX, fullImageWidth + 56, 44);
         _originalPhotoLabel.frame = CGRectMake(fullImageWidth + 42, 0, 80, 44);
     }
     [_doneButton sizeToFit];
@@ -477,6 +498,17 @@
                 [self select:_selectButton];
             }
         }
+    }
+}
+
+- (void)editButtonClick
+{
+    TZImagePickerController *_tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+    if (_tzImagePickerVc.didEditPhotoHandle) {
+        TZAssetModel *model = _models[self.currentIndex];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.currentIndex inSection:0];
+        TZPhotoPreviewCell *cell = (TZPhotoPreviewCell *)[_collectionView cellForItemAtIndexPath:indexPath];
+        _tzImagePickerVc.didEditPhotoHandle(self, cell.previewView.imageView.image, model.asset, self.isSelectOriginalPhoto);
     }
 }
 

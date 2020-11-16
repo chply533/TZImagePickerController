@@ -352,6 +352,7 @@
     self.fullImageBtnTitleStr = [NSBundle tz_localizedStringForKey:@"Full image"];
     self.settingBtnTitleStr = [NSBundle tz_localizedStringForKey:@"Setting"];
     self.processHintStr = [NSBundle tz_localizedStringForKey:@"Processing..."];
+    self.editBtnTitleStr = [NSBundle tz_localizedStringForKey:@"edit"];
 }
 
 - (void)setShowSelectedIndex:(BOOL)showSelectedIndex {

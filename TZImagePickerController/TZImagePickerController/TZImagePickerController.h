@@ -172,6 +172,7 @@
 @property (nonatomic, assign) NSInteger circleCropRadius;  ///< 圆形裁剪框半径大小
 @property (nonatomic, copy) void (^cropViewSettingBlock)(UIView *cropView);     ///< 自定义裁剪框的其他属性
 @property (nonatomic, copy) void (^navLeftBarButtonSettingBlock)(UIButton *leftButton);     ///< 自定义返回按钮样式及其属性
+@property (nonatomic, assign) BOOL allowEdit;            ///< 允许编辑
 
 /// 【自定义各页面/组件的样式】在界面初始化/组件setModel完成后调用，允许外界修改样式等
 @property (nonatomic, copy) void (^photoPickerPageUIConfigBlock)(UICollectionView *collectionView, UIView *bottomToolBar, UIButton *previewButton, UIButton *originalPhotoButton, UILabel *originalPhotoLabel, UIButton *doneButton, UIImageView *numberImageView, UILabel *numberLabel, UIView *divideLine);
@@ -233,6 +234,7 @@
 @property (nonatomic, copy) NSString *fullImageBtnTitleStr;
 @property (nonatomic, copy) NSString *settingBtnTitleStr;
 @property (nonatomic, copy) NSString *processHintStr;
+@property (nonatomic, copy) NSString *editBtnTitleStr;
 
 /// Icon theme color, default is green color like wechat, the value is r:31 g:185 b:34. Currently only support image selection icon when showSelectedIndex is YES. If you need it, please set it as soon as possible
 /// icon主题色，默认是微信的绿色，值是r:31 g:185 b:34。目前仅支持showSelectedIndex为YES时的图片选中icon。如需要，请尽早设置它。
@@ -247,7 +249,7 @@
 @property (nonatomic, copy) void (^imagePickerControllerDidCancelHandle)(void);
 @property (nonatomic, copy) void (^didFinishPickingVideoHandle)(UIImage *coverImage,PHAsset *asset);
 @property (nonatomic, copy) void (^didFinishPickingGifImageHandle)(UIImage *animatedImage,id sourceAssets);
-
+@property (nonatomic, copy) void (^didEditPhotoHandle)(TZPhotoPreviewController *photoPreviewVC, UIImage *photo,PHAsset *asset,BOOL isSelectOriginalPhoto);
 @property (nonatomic, weak) id<TZImagePickerControllerDelegate> pickerDelegate;
 
 @end
