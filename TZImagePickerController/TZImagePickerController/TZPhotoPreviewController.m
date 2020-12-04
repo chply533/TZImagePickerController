@@ -550,7 +550,6 @@
         currentCell.iCloudSyncFailedHandle = ^(id asset, BOOL isSyncFailed) {
             model.iCloudFailed = isSyncFailed;
             [weakSelf didICloudSyncStatusChanged:model];
-            [weakSelf.models replaceObjectAtIndex:indexPath.item withObject:model];
         };
     } else if (_tzImagePickerVc.allowPickingMultipleVideo && model.type == TZAssetModelMediaTypePhotoGif && _tzImagePickerVc.allowPickingGif) {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"TZGifPreviewCell" forIndexPath:indexPath];
@@ -558,7 +557,6 @@
         currentCell.previewView.iCloudSyncFailedHandle = ^(id asset, BOOL isSyncFailed) {
             model.iCloudFailed = isSyncFailed;
             [weakSelf didICloudSyncStatusChanged:model];
-            [weakSelf.models replaceObjectAtIndex:indexPath.item withObject:model];
         };
     } else {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"TZPhotoPreviewCell" forIndexPath:indexPath];
@@ -586,7 +584,6 @@
         photoPreviewCell.previewView.iCloudSyncFailedHandle = ^(id asset, BOOL isSyncFailed) {
             model.iCloudFailed = isSyncFailed;
             [weakSelf didICloudSyncStatusChanged:model];
-            [weakSelf.models replaceObjectAtIndex:indexPath.item withObject:model];
         };
     }
     
