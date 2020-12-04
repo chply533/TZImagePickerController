@@ -650,6 +650,27 @@
             _originalPhotoButton.hidden = NO;
             if (_isSelectOriginalPhoto)  _originalPhotoLabel.hidden = NO;
         }
+        
+        if (model.type == TZAssetModelMediaTypePhoto || model.type == TZAssetModelMediaTypeLivePhoto) {
+            if (_tzImagePickerVc.allowEdit) {
+                _editButton.hidden = NO;
+            }
+        } else {
+            if (_tzImagePickerVc.allowEdit) {
+                _editButton.hidden = YES;
+            }
+        }
+        
+        if (_tzImagePickerVc.allowPickingOriginalPhoto && !_originalPhotoButton.hidden && _tzImagePickerVc.allowEdit) {
+            CGFloat fullImageWidth = [_tzImagePickerVc.fullImageBtnTitleStr boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13]} context:nil].size.width;
+            CGFloat originalPhotoButtonX = 0;
+            if (!_editButton.hidden){
+                originalPhotoButtonX = (self.view.tz_width - (fullImageWidth + 56)) * 0.5;
+            }
+            _originalPhotoButton.frame = CGRectMake(originalPhotoButtonX, 0, fullImageWidth + 56, 44);
+            _originalPhotoLabel.frame = CGRectMake(fullImageWidth + 42, 0, 80, 44);
+        }
+        
     }
     
     _doneButton.hidden = NO;
