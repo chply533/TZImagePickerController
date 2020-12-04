@@ -213,7 +213,18 @@
             }];
         } progressHandler:nil networkAccessAllowed:NO];
     } else {
-        self.asset = model.asset;
+        if (model.editedImage) {
+            if (_asset && self.imageRequestID) {
+                [[PHImageManager defaultManager] cancelImageRequest:self.imageRequestID];
+            }
+            _asset = model.asset;
+            self.imageView.image = photo;
+            [self resizeSubviews];
+            [self configMaximumZoomScale];
+        }else{
+            self.asset = model.asset;
+        }
+        
     }
 }
 

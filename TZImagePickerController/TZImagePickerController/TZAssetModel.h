@@ -28,6 +28,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) TZAssetModelMediaType type;
 @property (nonatomic, copy) NSString *timeLength;
 @property (nonatomic, assign) BOOL iCloudFailed;
+@property (nonatomic, assign) BOOL isEdited;// 是否被编辑过
+@property (nonatomic, strong) UIImage *editedImage;// 编辑过的图片
 
 /// Init a photo dataModel With a PHAsset
 /// 用一个PHAsset实例，初始化一个照片模型
