@@ -218,7 +218,7 @@
                 [[PHImageManager defaultManager] cancelImageRequest:self.imageRequestID];
             }
             _asset = model.asset;
-            self.imageView.image = photo;
+            self.imageView.image = model.editedImage;
             [self resizeSubviews];
             [self configMaximumZoomScale];
         }else{
